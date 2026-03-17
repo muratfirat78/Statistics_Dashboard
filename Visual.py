@@ -104,6 +104,8 @@ class VisualManager():
         self.anova_df = None
         self.source = None
 
+        self.sizedelta = None
+
         self.readfile =  None
         self.add =  None
         self.add2 =  None
@@ -112,8 +114,30 @@ class VisualManager():
         self.boxout= None
         self.resultout= None
 
-        return
+        self.beforefeat = None
+        self.afterfeat = None
 
+        return
+        
+    def setsizedelta(self,mydel):
+        self.sizedelta = mydel
+        return 
+    def getsizedelta(self):
+        return self.sizedelta
+
+        
+    def setbeforefeat(self,mydel):
+        self.beforefeat = mydel
+        return 
+    def getbeforefeat(self):
+        return self.beforefeat
+
+    def setafterfeat(self,mydel):
+        self.afterfeat = mydel
+        return 
+    def getafterfeat(self):
+        return self.afterfeat
+        
     def getresultout(self):
         return self.resultout
 
@@ -662,8 +686,14 @@ class VisualManager():
 
         self.gettestingtext().value = " configuration...: "+str(self.getprobtype().value)+"\n"
 
+        self.getbeforefeat().layout.display = 'none'
+        self.getafterfeat().layout.display = 'none'
+
         if self.getprobtype().value == "One sample mean":
+            self.getSAMPSIZEtxt().disabled = False
+            self.getPOPMEANtxt().disabled = False
             self.getDFPage().layout.visibility= 'hidden'
+            self.getsizedelta().layout.visibility = 'visible'
             self.getDFPage().layout.display = 'none'
             self.getcaseexp().layout.display= 'block'
             self.getcaseexp().layout.visibility = 'visible'
@@ -693,10 +723,14 @@ class VisualManager():
             self.getlinelabel().layout.display= 'none'
             
         if self.getprobtype().value == "Proportion":
+            self.getSAMPSIZEtxt().disabled = False
+            self.getPOPMEANtxt().disabled = False
             self.getDFPage().layout.visibility= 'hidden'
+          
             self.getDFPage().layout.display = 'none'
             self.getcaseexp().layout.display= 'block'
             self.getcaseexp().layout.visibility = 'visible'
+            self.getsizedelta().layout.visibility = 'visible'
             self.getPOPMEANtxt().description = 'P.Proportion'
             self.getPOPMEANtxt().layout.visibility = 'visible'
             self.getSAMPSIZEtxt().layout.visibility = 'visible'
@@ -721,10 +755,14 @@ class VisualManager():
             self.gettestingtext().value = "Proportion  configuration...: "+"\n"
             
         if self.getprobtype().value  == "Difference between two means":
+            self.getSAMPSIZEtxt().disabled = False
+            self.getPOPMEANtxt().disabled = False
+          
             self.getDFPage().layout.visibility= 'hidden'
             self.getDFPage().layout.display = 'none'
             self.getcaseexp().layout.display= 'block'
             self.getcaseexp().layout.visibility = 'visible'
+            self.getsizedelta().layout.visibility = 'visible'
             self.getPOPMEANtxt().description = 'Mean Diff.'
             self.getSAMPSIZEtxt().description = 'S.Sizes'
             self.getSAMPMEANtxt().layout.visibility='visible'
@@ -747,14 +785,24 @@ class VisualManager():
             self.getlinelabel().layout.display= 'none'
     
         if self.getprobtype().value == "Paired sampled t-test":
+
+            self.getbeforefeat().layout.display = 'block'
+            self.getafterfeat().layout.display = 'block'
+
+            self.getbeforefeat().layout.visibility = 'visible'
+            self.getafterfeat().layout.visibility = 'visible'
+           
             self.getDFPage().layout.display = 'block'
             self.getDFPage().layout.visibility= 'visible'
             self.getexmplst().layout.visibility = 'hidden'
+            self.getsizedelta().layout.visibility = 'hidden'
+           
             self.getfolderselect().layout.display= 'block'
             self.getfolderselect().layout.visibility= 'visible'
             self.getPOPMEANtxt().description = 'Mean Diff.'
+            self.getmytxt().layout.visibility = 'hidden'
             self.getSAMPSIZEtxt().description = 'S.Size'
-            self.getSAMPMEANtxt().layout.visibility='visible'
+            self.getSAMPMEANtxt().layout.visibility='hidden'
             self.getcaseexp().layout.visibility='hidden'
             self.getcaseexp().layout.display= 'none'
             self.getstdtype().layout.visibility='hidden'
@@ -835,7 +883,7 @@ class VisualManager():
 
         Pop_mean = None
         if mode.find('Paired sampled t-test') == -1:
-                Pop_mean = float(self.getPOPMEANtxt().value)
+            Pop_mean = float(self.getPOPMEANtxt().value)
         Pop_stdev = None
 
        
@@ -908,11 +956,12 @@ class VisualManager():
 
     def SelBefFeat(self,event):
         self.setprtt_bef_feat(self.getprfeatures().value)
-    
+        self.getbeforefeat().value = self.getprfeatures().value
         return
     
     def SelAftFeat(self,event):
         self.setprtt_aft_feat(self.getprfeatures().value)
+        self.getafterfeat().value = self.getprfeatures().value
     
         return
 
@@ -920,6 +969,7 @@ class VisualManager():
     
         if not is_float(self.getSAMPSIZEtxt().value):
             return False
+            
                                   
         return
 
@@ -928,7 +978,15 @@ class VisualManager():
         url = "https://github.com/muratfirat78/CPP_Datasets/raw/main/"+self.getfolderselect().value
     
         self.setprd_ttest_df(pd.read_csv(url,sep =',',quotechar="'"))
-    
+
+        self.getSAMPSIZEtxt().value = str(len(self.getprd_ttest_df()))
+        self.getSAMPSIZEtxt().disabled = True
+        self.getbeforefeat().value = ''
+        self.getafterfeat().value = ''
+
+        self.getPOPMEANtxt().value = str(0)
+        self.getPOPMEANtxt().disabled = True
+        
         self.getprfeatures().options = [c for c in self.getprd_ttest_df().columns]
     
         with self.getDFPage():
@@ -958,11 +1016,15 @@ class VisualManager():
         self.setPOPgiven(widgets.Dropdown(options=['Given','Not given'], description='Population stdev:'))
         
         self.settestingtext(widgets.Textarea(value='', placeholder=' ',description='',disabled=True,layout = widgets.Layout(width='99%',height='65px')))
-        self.setresultexp(widgets.Textarea(value='', placeholder=' ',description='Conclusion:',disabled=False,layout = widgets.Layout(width='90%',height='130px')))
+        self.setresultexp(widgets.Textarea(value='', placeholder=' ',description='Conclusion:',disabled=False,layout = widgets.Layout(width='90%',height='100px')))
         
         self.setalternative(widgets.Dropdown(options=['<','>'], description='Alternative:'))
         self.getalternative().layout.visibility = 'hidden'
-        
+
+        self.setbeforefeat(widgets.Text(description = 'Before: ', value='',disabled=False,layout = widgets.Layout(width='250px')))
+        self.setafterfeat(widgets.Text(description = 'After: ', value='',disabled=False,layout = widgets.Layout(width='250px')))
+
+       
     
         
         self.setexmplst(widgets.Dropdown(options=[v for v in cases.keys()], description='Questions'))
@@ -991,8 +1053,10 @@ class VisualManager():
         
         f =interactive(self.PlotNumbers, Conf_level = widgets.FloatSlider(min=0.01,max=0.1,step=0.01,value=0.05));
         self.setitems([c for c in f.children])
+
+        self.setsizedelta(widgets.IntSlider(min=-25,max=25,step=5,value=0))
         
-        f2 =interactive(self.Sample_Change, Size_delta = widgets.IntSlider(min=-25,max=25,step=5,value=0));
+        f2 =interactive(self.Sample_Change, Size_delta = self.getsizedelta());
         self.setitems2([c for c in f2.children])
         
         pairedlinks = ['Hypothermia.csv',
@@ -1014,7 +1078,9 @@ class VisualManager():
       
         self.setaddpr(widgets.Button(description= " Assign Before "))
         self.getaddpr().layout.display= 'none'
+        self.getaddpr().layout.width = '110px'
         self.setadd2pr(widgets.Button(description=" Assign After  "))
+        self.getadd2pr().layout.width = '110px'
         self.getadd2pr().layout.display= 'none'
         
         self.getaddpr().on_click(self.SelBefFeat)
@@ -1025,6 +1091,11 @@ class VisualManager():
         
         self.setDFPage(widgets.Output())
         self.getDFPage().layout.display = 'none'
+
+
+        self.getbeforefeat().layout.display = 'none'
+        self.getafterfeat().layout.display = 'none'
+      
         
         
         
@@ -1035,13 +1106,25 @@ class VisualManager():
         
         
         tab_1 = VBox(children=[
-                         HBox(children = [VBox(children=[self.getexmplst(),self.getprobtype(),HBox(children = [self.getPOPMEANtxt(),self.getSAMPMEANtxt()]),self.getSAMPSIZEtxt(),HBox(children = [self.getmytxt(),self.getstdtype()]),
-                                                         self.gethyptype()
-                                          ,VBox(children=self.getitems2()),VBox(children=self.getitems())])
-                                          ,self.getcaseexp(),VBox(children=[HBox(children = [self.getfolderselect()]),
-                                                                  HBox(children = [self.getreadpfile(),self.getprfeatures(),VBox(children = [self.getaddpr(),self.getadd2pr()])])
-                                                                  ,self.getDFPage()])],layout=Layout(width='95%'))
-                        ,self.getmybutton2(),self.gettestingtext(),VBox(children=[self.getInvFigPage()]),self.getresultexp(),self.getmybutton3()],layout=tablayout)
+                         HBox(children = [
+                                     VBox( 
+                                      children=[self.getexmplst(),self.getprobtype(),
+                                                HBox(children = [self.getPOPMEANtxt(),self.getSAMPMEANtxt()]),self.getSAMPSIZEtxt(),
+                                                HBox(children = [self.getmytxt(),self.getstdtype()]),
+                                                self.gethyptype(),
+                                                VBox(children=self.getitems2()),
+                                                VBox(children=self.getitems())]
+                                        ),
+                                        self.getcaseexp(),
+                                      VBox(children=[
+                                              HBox(children = [self.getfolderselect(),self.getreadpfile()]),
+                                              HBox(children = [VBox(children = [self.getaddpr(),self.getadd2pr()]),self.getprfeatures(),
+                                                              ]),
+                                              HBox(children = [self.getbeforefeat(),self.getafterfeat()])
+                                              ]
+                                          )
+                                         ],layout=Layout(width='99%'))
+                        ,self.getDFPage(),self.getmybutton2(),self.gettestingtext(),VBox(children=[self.getInvFigPage()]),self.getresultexp(),self.getmybutton3()],layout=tablayout)
 
           
         return tab_1
