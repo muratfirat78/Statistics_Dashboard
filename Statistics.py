@@ -81,8 +81,8 @@ def TestHypothesis2(sample_size,sample_mean,sample_stdev,pop_mean,pop_stdev,twos
         test_stat = 0
         p_val = 0
         conclusion = ''
-        H_null = 'H0 : \mu '
-        H_alt = 'H1 : \mu '
+        H_null = r'H0 : \mu '
+        H_alt = r'H1 : \mu '
         
         ayz = None
 
