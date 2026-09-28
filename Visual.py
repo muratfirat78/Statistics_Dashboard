@@ -1458,6 +1458,7 @@ class VisualManager():
 
         return
 
+
     def SelValFeat(self,event):
         self.setanova_value_feat(self.getfeatures().value)
 
