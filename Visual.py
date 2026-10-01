@@ -6,9 +6,12 @@ Created on Wed Apr  3 11:46:59 2024
 """
 
 ##### import ipywidgets as widgets
-from IPython.display import clear_output
+from IPython.display import clear_output, HTML
 from IPython import display
 from ipywidgets import *
+
+# Make slider readout visible but not editable
+display.display(HTML("<style>.widget-readout { pointer-events: none; user-select: none; }</style>"))
 from datetime import timedelta,date,datetime
 import matplotlib.pyplot as plt
 import warnings
@@ -945,7 +948,7 @@ class VisualManager():
 
 
 
-        Conf_lvl = round(float(self.getconflvl().value), 2)
+        Conf_lvl = float(self.getconflvl().value)
         Two_sided = (self.gethyptype().value == "Two-tailed")
         Alt_side = '' # only read in one-sided case: '>' or '<' -> H_1: \mu > x or \mu < x (x is claimed population parameter)
 
@@ -1066,9 +1069,13 @@ class VisualManager():
 
         self.setmybutton3(widgets.Button(description='Save', disabled=False,layout = widgets.Layout(align_items='flex-end',width = '150px')))
 
-        self.setitems([widgets.FloatSlider(min=0.01,max=0.1,step=0.01,value=0.05,description='α:')])
-        self.getitems()[0].style = {'description_width': 'initial'}
-        self.getitems()[0].readout = False
+
+        slider = widgets.FloatSlider(min=0.01,max=0.1,step=0.01,value=0.05,description='Conf. level:')
+        slider.style = {'description_width': 'initial'}
+        slider.readout = True
+        slider.readout_format = '.2f'
+        slider.observe(lambda change: self.PlotNumbers(change['new']), names='value')
+        self.setitems([slider])
 
         self.setsizedelta(widgets.IntSlider(min=-25,max=25,step=5,value=0))
 
@@ -1526,5 +1533,3 @@ class VisualManager():
 
 
         return tab_3
-
-
