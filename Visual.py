@@ -1067,7 +1067,9 @@ class VisualManager():
         self.setmybutton3(widgets.Button(description='Save', disabled=False,layout = widgets.Layout(align_items='flex-end',width = '150px')))
 
         self.setitems([widgets.FloatSlider(min=0.01,max=0.1,step=0.01,value=0.05,description='α:')])
-        
+        self.getitems()[0].style = {'description_width': 'initial'}
+        self.getitems()[0].readout = False
+
         self.setsizedelta(widgets.IntSlider(min=-25,max=25,step=5,value=0))
 
         f2 =interactive(self.Sample_Change, Size_delta = self.getsizedelta());
