@@ -945,7 +945,7 @@ class VisualManager():
 
 
 
-        Conf_lvl = float(self.getconflvl().value)
+        Conf_lvl = round(float(self.getconflvl().value), 2)
         Two_sided = (self.gethyptype().value == "Two-tailed")
         Alt_side = '' # only read in one-sided case: '>' or '<' -> H_1: \mu > x or \mu < x (x is claimed population parameter)
 
