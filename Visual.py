@@ -6,12 +6,9 @@ Created on Wed Apr  3 11:46:59 2024
 """
 
 ##### import ipywidgets as widgets
-from IPython.display import clear_output, HTML
+from IPython.display import clear_output
 from IPython import display
 from ipywidgets import *
-
-# Make slider readout visible but not editable
-display.display(HTML("<style>.widget-readout { pointer-events: none; user-select: none; }</style>"))
 from datetime import timedelta,date,datetime
 import matplotlib.pyplot as plt
 import warnings
@@ -1070,12 +1067,12 @@ class VisualManager():
         self.setmybutton3(widgets.Button(description='Save', disabled=False,layout = widgets.Layout(align_items='flex-end',width = '150px')))
 
 
-        slider = widgets.FloatSlider(min=0.01,max=0.1,step=0.01,value=0.05,description='Conf. level:')
-        slider.style = {'description_width': 'initial'}
-        slider.readout = True
-        slider.readout_format = '.2f'
-        slider.observe(lambda change: self.PlotNumbers(change['new']), names='value')
-        self.setitems([slider])
+        slider = widgets.FloatSlider(min=0.01,max=0.1,step=0.01,value=0.05,
+                                      description='α:', readout=False)
+        slider_label = widgets.Label(value=f'α = {slider.value:.2f}')
+        slider.observe(lambda change: slider_label.__setattr__('value', f'α = {change["new"]:.2f}'), names='value')
+        self.setitems([widgets.HBox([slider, slider_label])])
+        self._slider = slider
 
         self.setsizedelta(widgets.IntSlider(min=-25,max=25,step=5,value=0))
 
@@ -1122,7 +1119,7 @@ class VisualManager():
 
 
 
-        self.setconflvl(self.getitems()[0])
+        self.setconflvl(self._slider)
 
         tablayout = widgets.Layout(align_items='center',width= '100%',height='1050px')
 
